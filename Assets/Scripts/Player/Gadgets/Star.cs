@@ -3,29 +3,33 @@ using UnityEngine;
 public class Star : MonoBehaviour
 {
     public GameObject star;
+    Rigidbody2D rb;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public float floatHeight;
+    public float liftForce;
+    public float damping;
+
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Shoot()
     {
-        
-    }
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up);
 
-    public void Shooting()
-    {
-        star.active = true;
+        print(hit.collider.tag);
 
-        RaycastHit rayHit;
-        Debug.DrawRay(transform.position, transform.forward, Color.green);
-
-        if (Physics.Raycast(transform.position, transform.forward, out rayHit))
+        if (hit.collider == null)
         {
-            star.transform.position = rayHit.point;
+            float distance = Mathf.Abs(hit.point.y - transform.position.y);
+            float heightError = floatHeight - distance;
+
+            float force = liftForce * heightError - rb.linearVelocity.y * damping;
+
+            // Apply the force to the rigidbody.
+            rb.AddForce(Vector3.up * force);
         }
     }
+
 }
